@@ -740,7 +740,7 @@ func (p *PostingsIterator) ActualBitmap() *roaring.Bitmap {
 }
 
 // ReplaceActual replaces the ActualBM with the provided
-// bitmap AND also
+// bitmap
 func (p *PostingsIterator) ReplaceActual(abm *roaring.Bitmap) {
 	p.ActualBM = abm
 	p.Actual = abm.Iterator()
