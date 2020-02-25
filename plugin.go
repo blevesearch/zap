@@ -1,4 +1,4 @@
-// Copyright © 2020 Couchbase, Inc.
+//  Copyright (c) 2020 Couchbase, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package zap
 
 import (
-	"github.com/blevesearch/zap/v11/cmd/zap/cmd"
+	"github.com/blevesearch/bleve/index/scorch/segment"
 )
 
-func main() {
-	cmd.Execute()
+type ZapPlugin struct{}
+
+func (*ZapPlugin) Type() string {
+	return Type
+}
+
+func (*ZapPlugin) Version() uint32 {
+	return Version
+}
+
+func Plugin() segment.Plugin {
+	return &ZapPlugin{}
 }
