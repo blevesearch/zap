@@ -18,6 +18,8 @@ import (
 	"github.com/blevesearch/bleve/index/scorch/segment"
 )
 
+// ZapPlugin implements the Plugin interface of
+// the blevesearch/bleve/index/scorch/segment pkg
 type ZapPlugin struct{}
 
 func (*ZapPlugin) Type() string {
@@ -28,6 +30,8 @@ func (*ZapPlugin) Version() uint32 {
 	return Version
 }
 
+// Plugin returns an instance segment.Plugin for use
+// by the Scorch indexing scheme
 func Plugin() segment.Plugin {
 	return &ZapPlugin{}
 }

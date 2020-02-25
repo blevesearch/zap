@@ -35,8 +35,7 @@ const docDropped = math.MaxUint64 // sentinel docNum to represent a deleted doc
 
 // Merge takes a slice of segments and bit masks describing which
 // documents may be dropped, and creates a new segment containing the
-// remaining data.  This new segment is built at the specified path,
-// with the provided chunkFactor.
+// remaining data.  This new segment is built at the specified path.
 func (*ZapPlugin) Merge(segments []seg.Segment, drops []*roaring.Bitmap, path string,
 	closeCh chan struct{}, s seg.StatsReporter) (
 	[][]uint64, uint64, error) {
