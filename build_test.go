@@ -15,7 +15,9 @@
 package zap
 
 import (
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/blevesearch/bleve/analysis"
@@ -24,13 +26,19 @@ import (
 )
 
 func TestBuild(t *testing.T) {
-	_ = os.RemoveAll("/tmp/scorch.zap")
+	tmpDir, err := ioutil.TempDir("", "scorch-test")
+	if err != nil {
+		t.Fatalf("error creating temp dir: %v", err)
+	}
+	defer func() {
+		_ = os.RemoveAll(tmpDir)
+	}()
 
 	sb, _, err := buildTestSegment()
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = PersistSegmentBase(sb, "/tmp/scorch.zap")
+	err = PersistSegmentBase(sb, filepath.Join(tmpDir, "scorch.zap"))
 	if err != nil {
 		t.Fatal(err)
 	}

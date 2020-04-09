@@ -15,7 +15,9 @@
 package zap
 
 import (
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -104,16 +106,21 @@ func buildTestSegmentForDict() (*SegmentBase, uint64, error) {
 }
 
 func TestDictionary(t *testing.T) {
-
-	_ = os.RemoveAll("/tmp/scorch.zap")
+	tmpDir, err := ioutil.TempDir("", "scorch-test")
+	if err != nil {
+		t.Fatalf("error creating temp dir: %v", err)
+	}
+	defer func() {
+		_ = os.RemoveAll(tmpDir)
+	}()
 
 	testSeg, _, _ := buildTestSegmentForDict()
-	err := PersistSegmentBase(testSeg, "/tmp/scorch.zap")
+	err = PersistSegmentBase(testSeg, filepath.Join(tmpDir, "scorch.zap"))
 	if err != nil {
 		t.Fatalf("error persisting segment: %v", err)
 	}
 
-	segment, err := zapPlugin.Open("/tmp/scorch.zap")
+	segment, err := zapPlugin.Open(filepath.Join(tmpDir, "scorch.zap"))
 	if err != nil {
 		t.Fatalf("error opening segment: %v", err)
 	}
@@ -191,15 +198,21 @@ func TestDictionaryError(t *testing.T) {
 		hash[uint8(i)] = *lb
 	}
 
-	_ = os.RemoveAll("/tmp/scorch.zap")
+	tmpDir, err := ioutil.TempDir("", "scorch-test")
+	if err != nil {
+		t.Fatalf("error creating temp dir: %v", err)
+	}
+	defer func() {
+		_ = os.RemoveAll(tmpDir)
+	}()
 
 	testSeg, _, _ := buildTestSegmentForDict()
-	err := PersistSegmentBase(testSeg, "/tmp/scorch.zap")
+	err = PersistSegmentBase(testSeg, filepath.Join(tmpDir, "scorch.zap"))
 	if err != nil {
 		t.Fatalf("error persisting segment: %v", err)
 	}
 
-	segment, err := zapPlugin.Open("/tmp/scorch.zap")
+	segment, err := zapPlugin.Open(filepath.Join(tmpDir, "scorch.zap"))
 	if err != nil {
 		t.Fatalf("error opening segment: %v", err)
 	}
@@ -294,16 +307,21 @@ func TestDictionaryError(t *testing.T) {
 }
 
 func TestDictionaryBug1156(t *testing.T) {
-
-	_ = os.RemoveAll("/tmp/scorch.zap")
+	tmpDir, err := ioutil.TempDir("", "scorch-test")
+	if err != nil {
+		t.Fatalf("error creating temp dir: %v", err)
+	}
+	defer func() {
+		_ = os.RemoveAll(tmpDir)
+	}()
 
 	testSeg, _, _ := buildTestSegmentForDict()
-	err := PersistSegmentBase(testSeg, "/tmp/scorch.zap")
+	err = PersistSegmentBase(testSeg, filepath.Join(tmpDir, "scorch.zap"))
 	if err != nil {
 		t.Fatalf("error persisting segment: %v", err)
 	}
 
-	segment, err := zapPlugin.Open("/tmp/scorch.zap")
+	segment, err := zapPlugin.Open(filepath.Join(tmpDir, "scorch.zap"))
 	if err != nil {
 		t.Fatalf("error opening segment: %v", err)
 	}
