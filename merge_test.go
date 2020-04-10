@@ -59,7 +59,7 @@ func TestMerge(t *testing.T) {
 	defer func() {
 		cerr := segment.Close()
 		if cerr != nil {
-			t.Fatalf("error closing segment: %v", err)
+			t.Fatalf("error closing segment: %v", cerr)
 		}
 	}()
 
@@ -70,7 +70,7 @@ func TestMerge(t *testing.T) {
 	defer func() {
 		cerr := segment2.Close()
 		if cerr != nil {
-			t.Fatalf("error closing segment: %v", err)
+			t.Fatalf("error closing segment: %v", cerr)
 		}
 	}()
 
@@ -91,7 +91,7 @@ func TestMerge(t *testing.T) {
 	defer func() {
 		cerr := seg3.Close()
 		if cerr != nil {
-			t.Fatalf("error closing segment: %v", err)
+			t.Fatalf("error closing segment: %v", cerr)
 		}
 	}()
 
@@ -145,7 +145,7 @@ func testMergeWithEmptySegments(t *testing.T, before bool, numEmptySegments int)
 	defer func() {
 		cerr := segment.Close()
 		if cerr != nil {
-			t.Fatalf("error closing segment: %v", err)
+			t.Fatalf("error closing segment: %v", cerr)
 		}
 	}()
 
@@ -176,7 +176,7 @@ func testMergeWithEmptySegments(t *testing.T, before bool, numEmptySegments int)
 		defer func(emptyFileSegment *Segment) {
 			cerr := emptyFileSegment.Close()
 			if cerr != nil {
-				t.Fatalf("error closing segment: %v", err)
+				t.Fatalf("error closing segment: %v", cerr)
 			}
 		}(emptyFileSegment.(*Segment))
 
@@ -204,7 +204,7 @@ func testMergeWithEmptySegments(t *testing.T, before bool, numEmptySegments int)
 	defer func() {
 		cerr := segCur.Close()
 		if cerr != nil {
-			t.Fatalf("error closing segment: %v", err)
+			t.Fatalf("error closing segment: %v", cerr)
 		}
 	}()
 
@@ -246,7 +246,7 @@ func testMergeWithSelf(t *testing.T, tmpDir string, segCur *Segment, expectedCou
 		defer func(s *Segment) {
 			cerr := s.Close()
 			if cerr != nil {
-				t.Fatalf("error closing segment: %v", err)
+				t.Fatalf("error closing segment: %v", cerr)
 			}
 		}(segNew)
 
@@ -605,7 +605,7 @@ func testMergeWithUpdates(t *testing.T, segmentDocIds [][]string, docsToDrop []*
 		defer func(segment *Segment) {
 			cerr := segment.Close()
 			if cerr != nil {
-				t.Fatalf("error closing segment: %v", err)
+				t.Fatalf("error closing segment: %v", cerr)
 			}
 		}(segment.(*Segment))
 
@@ -629,7 +629,7 @@ func testMergeAndDropSegments(t *testing.T, tmpDir string, segsToMerge []seg.Seg
 	defer func() {
 		cerr := segm.Close()
 		if cerr != nil {
-			t.Fatalf("error closing segment: %v", err)
+			t.Fatalf("error closing segment: %v", cerr)
 		}
 	}()
 
@@ -837,7 +837,7 @@ func TestMergeBytesWritten(t *testing.T) {
 	defer func() {
 		cerr := segment.Close()
 		if cerr != nil {
-			t.Fatalf("error closing segment: %v", err)
+			t.Fatalf("error closing segment: %v", cerr)
 		}
 	}()
 
@@ -848,7 +848,7 @@ func TestMergeBytesWritten(t *testing.T) {
 	defer func() {
 		cerr := segment2.Close()
 		if cerr != nil {
-			t.Fatalf("error closing segment: %v", err)
+			t.Fatalf("error closing segment: %v", cerr)
 		}
 	}()
 
@@ -873,7 +873,7 @@ func TestMergeBytesWritten(t *testing.T) {
 	defer func() {
 		cerr := seg3.Close()
 		if cerr != nil {
-			t.Fatalf("error closing segment: %v", err)
+			t.Fatalf("error closing segment: %v", cerr)
 		}
 	}()
 

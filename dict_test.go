@@ -127,7 +127,7 @@ func TestDictionary(t *testing.T) {
 	defer func() {
 		cerr := segment.Close()
 		if cerr != nil {
-			t.Fatalf("error closing segment: %v", err)
+			t.Fatalf("error closing segment: %v", cerr)
 		}
 	}()
 
@@ -219,7 +219,7 @@ func TestDictionaryError(t *testing.T) {
 	defer func() {
 		cerr := segment.Close()
 		if cerr != nil {
-			t.Fatalf("error closing segment: %v", err)
+			t.Fatalf("error closing segment: %v", cerr)
 		}
 	}()
 
@@ -328,7 +328,7 @@ func TestDictionaryBug1156(t *testing.T) {
 	defer func() {
 		cerr := segment.Close()
 		if cerr != nil {
-			t.Fatalf("error closing segment: %v", err)
+			t.Fatalf("error closing segment: %v", cerr)
 		}
 	}()
 
