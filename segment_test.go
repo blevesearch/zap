@@ -16,6 +16,7 @@ package zap
 
 import (
 	"io/ioutil"
+	"log"
 	"math"
 	"os"
 	"path/filepath"
@@ -36,6 +37,7 @@ func TestOpen(t *testing.T) {
 		t.Fatalf("error creating temp dir: %v", err)
 	}
 	defer func() {
+		log.Printf("removing %s", tmpDir)
 		_ = os.RemoveAll(tmpDir)
 	}()
 
@@ -50,6 +52,7 @@ func TestOpen(t *testing.T) {
 		t.Fatalf("error opening segment: %v", err)
 	}
 	defer func() {
+		log.Printf("closing %s", segment.(*Segment).path)
 		cerr := segment.Close()
 		if cerr != nil {
 			t.Fatalf("error closing segment: %v", cerr)
@@ -334,6 +337,7 @@ func TestOpen(t *testing.T) {
 	if fieldValuesSeen != 5 {
 		t.Errorf("expected 5 field values, got %d", fieldValuesSeen)
 	}
+	log.Printf("end")
 }
 
 func TestOpenMulti(t *testing.T) {
