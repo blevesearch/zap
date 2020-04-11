@@ -42,8 +42,7 @@ var ValidateDocFields = func(field document.Field) error {
 	return nil
 }
 
-// AnalysisResultsToSegmentBase produces an in-memory zap-encoded
-// SegmentBase from analysis results
+// New produces an in-memory zap-encoded SegmentBase from analysis results
 func (z *ZapPlugin) New(results []*index.AnalysisResult) (
 	segment.Segment, uint64, error) {
 	return z.newWithChunkMode(results, DefaultChunkMode)

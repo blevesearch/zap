@@ -415,7 +415,7 @@ func compareSegments(a, b *Segment) string {
 					}
 
 					if fieldName == "_id" {
-						docId := next.Term
+						docID := next.Term
 						docNumA := apitrn.Number()
 						docNumB := bpitrn.Number()
 						afields := map[string]interface{}{}
@@ -444,7 +444,7 @@ func compareSegments(a, b *Segment) string {
 							rv = append(rv, fmt.Sprintf("afields != bfields,"+
 								" id: %s, docNumA: %d, docNumB: %d,"+
 								" afields: %#v, bfields: %#v",
-								docId, docNumA, docNumB, afields, bfields))
+								docID, docNumA, docNumB, afields, bfields))
 						}
 					}
 				}

@@ -502,7 +502,7 @@ func (s *Segment) Version() uint32 {
 	return s.version
 }
 
-// ChunkFactor returns the chunk factor in the file footer
+// ChunkMode returns the chunk factor in the file footer
 func (s *Segment) ChunkMode() uint32 {
 	return s.chunkMode
 }

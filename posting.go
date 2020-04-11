@@ -243,22 +243,22 @@ func (p *PostingsList) Count() uint64 {
 	return n - e
 }
 
-func (rv *PostingsList) read(postingsOffset uint64, d *Dictionary) error {
-	rv.postingsOffset = postingsOffset
+func (p *PostingsList) read(postingsOffset uint64, d *Dictionary) error {
+	p.postingsOffset = postingsOffset
 
 	// handle "1-hit" encoding special case
-	if rv.postingsOffset&FSTValEncodingMask == FSTValEncoding1Hit {
-		return rv.init1Hit(postingsOffset)
+	if p.postingsOffset&FSTValEncodingMask == FSTValEncoding1Hit {
+		return p.init1Hit(postingsOffset)
 	}
 
 	// read the location of the freq/norm details
 	var n uint64
 	var read int
 
-	rv.freqOffset, read = binary.Uvarint(d.sb.mem[postingsOffset+n : postingsOffset+binary.MaxVarintLen64])
+	p.freqOffset, read = binary.Uvarint(d.sb.mem[postingsOffset+n : postingsOffset+binary.MaxVarintLen64])
 	n += uint64(read)
 
-	rv.locOffset, read = binary.Uvarint(d.sb.mem[postingsOffset+n : postingsOffset+n+binary.MaxVarintLen64])
+	p.locOffset, read = binary.Uvarint(d.sb.mem[postingsOffset+n : postingsOffset+n+binary.MaxVarintLen64])
 	n += uint64(read)
 
 	var postingsLen uint64
@@ -267,10 +267,10 @@ func (rv *PostingsList) read(postingsOffset uint64, d *Dictionary) error {
 
 	roaringBytes := d.sb.mem[postingsOffset+n : postingsOffset+n+postingsLen]
 
-	if rv.postings == nil {
-		rv.postings = roaring.NewBitmap()
+	if p.postings == nil {
+		p.postings = roaring.NewBitmap()
 	}
-	_, err := rv.postings.FromBuffer(roaringBytes)
+	_, err := p.postings.FromBuffer(roaringBytes)
 	if err != nil {
 		return fmt.Errorf("error loading roaring bitmap: %v", err)
 	}
@@ -278,11 +278,11 @@ func (rv *PostingsList) read(postingsOffset uint64, d *Dictionary) error {
 	return nil
 }
 
-func (rv *PostingsList) init1Hit(fstVal uint64) error {
+func (p *PostingsList) init1Hit(fstVal uint64) error {
 	docNum, normBits := FSTValDecode1Hit(fstVal)
 
-	rv.docNum1Hit = docNum
-	rv.normBits1Hit = normBits
+	p.docNum1Hit = docNum
+	p.normBits1Hit = normBits
 
 	return nil
 }
@@ -674,24 +674,24 @@ func (i *PostingsIterator) currChunkNext(nChunk uint32) error {
 
 // DocNum1Hit returns the docNum and true if this is "1-hit" optimized
 // and the docNum is available.
-func (p *PostingsIterator) DocNum1Hit() (uint64, bool) {
-	if p.normBits1Hit != 0 && p.docNum1Hit != DocNum1HitFinished {
-		return p.docNum1Hit, true
+func (i *PostingsIterator) DocNum1Hit() (uint64, bool) {
+	if i.normBits1Hit != 0 && i.docNum1Hit != DocNum1HitFinished {
+		return i.docNum1Hit, true
 	}
 	return 0, false
 }
 
 // ActualBitmap returns the underlying actual bitmap
 // which can be used up the stack for optimizations
-func (p *PostingsIterator) ActualBitmap() *roaring.Bitmap {
-	return p.ActualBM
+func (i *PostingsIterator) ActualBitmap() *roaring.Bitmap {
+	return i.ActualBM
 }
 
 // ReplaceActual replaces the ActualBM with the provided
 // bitmap
-func (p *PostingsIterator) ReplaceActual(abm *roaring.Bitmap) {
-	p.ActualBM = abm
-	p.Actual = abm.Iterator()
+func (i *PostingsIterator) ReplaceActual(abm *roaring.Bitmap) {
+	i.ActualBM = abm
+	i.Actual = abm.Iterator()
 }
 
 // PostingsIteratorFromBitmap constructs a PostingsIterator given an
