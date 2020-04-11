@@ -19,7 +19,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"sync"
 	"unsafe"
@@ -474,7 +473,6 @@ func (s *Segment) Close() (err error) {
 func (s *Segment) closeActual() (err error) {
 	if s.mm != nil {
 		err = s.mm.Unmap()
-		log.Printf("unmap returned: %v", err)
 	}
 	// try to close file even if unmap failed
 	if s.f != nil {
@@ -483,7 +481,6 @@ func (s *Segment) closeActual() (err error) {
 			// try to return first error
 			err = err2
 		}
-		log.Printf("close returned: %v", err2)
 	}
 	return
 }
