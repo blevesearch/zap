@@ -544,7 +544,7 @@ func writePostings(postings *roaring.Bitmap, tfEncoder, locEncoder *chunkedIntCo
 	w *CountHashWriter, bufMaxVarintLen64 []byte) (
 	offset uint64, err error) {
 	termCardinality := postings.GetCardinality()
-	if termCardinality <= 0 {
+	if termCardinality == 0 {
 		return 0, nil
 	}
 
@@ -770,7 +770,7 @@ func mergeStoredAndRemap(segments []*SegmentBase, drops []*roaring.Bitmap,
 // newDocNumOffsets is filled with the new offsets for each doc.
 func (s *SegmentBase) copyStoredDocs(newDocNum uint64, newDocNumOffsets []uint64,
 	w *CountHashWriter) error {
-	if s.numDocs <= 0 {
+	if s.numDocs == 0 {
 		return nil
 	}
 
