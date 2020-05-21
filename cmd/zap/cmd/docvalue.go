@@ -19,7 +19,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"log"
-	"math"
 	"sort"
 	"strconv"
 
@@ -27,6 +26,8 @@ import (
 	"github.com/golang/snappy"
 	"github.com/spf13/cobra"
 )
+
+const fieldNotUninverted = 0
 
 // docvalueCmd represents the docvalue command
 var docvalueCmd = &cobra.Command{
@@ -93,7 +94,7 @@ var docvalueCmd = &cobra.Command{
 			}
 
 			read += uint64(n)
-			if fieldStartLoc == math.MaxUint64 && len(args) == 1 {
+			if fieldStartLoc == fieldNotUninverted && len(args) == 1 {
 				fmt.Printf("FieldID: %d '%s' docvalue at %d (%x) not "+
 					" persisted \n", id, field, fieldStartLoc, fieldStartLoc)
 				continue
@@ -216,7 +217,7 @@ var docvalueCmd = &cobra.Command{
 		curChunkData := data[compressedDataLoc : compressedDataLoc+dataLength]
 
 		start, end = getDocValueLocs(uint64(localDocNum), curChunkHeader)
-		if start == math.MaxUint64 || end == math.MaxUint64 {
+		if start == fieldNotUninverted || end == fieldNotUninverted {
 			fmt.Printf("No field values found for localDocNum: %d\n",
 				localDocNum)
 			fmt.Printf("Try docNums present in chunk: %s\n",
@@ -256,7 +257,7 @@ func getDocValueLocs(docNum uint64, metaHeader []zap.MetaData) (uint64, uint64) 
 	if i < len(metaHeader) && metaHeader[i].DocNum == docNum {
 		return zap.ReadDocValueBoundary(i, metaHeader)
 	}
-	return math.MaxUint64, math.MaxUint64
+	return fieldNotUninverted, fieldNotUninverted
 }
 
 func metaDataDocNums(metaHeader []zap.MetaData) string {
