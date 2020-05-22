@@ -16,6 +16,7 @@ package zap
 
 import (
 	"bufio"
+	"math"
 	"os"
 
 	"github.com/couchbase/vellum"
@@ -25,11 +26,7 @@ const Version uint32 = 13
 
 const Type string = "zap"
 
-// We can safely use 0 to represent fieldNotUninverted since 0
-// could never be a valid address for doc values start/end.
-// (stored field index is always non-empty and earlier in the
-// file)
-const fieldNotUninverted = 0
+const fieldNotUninverted = math.MaxUint64
 
 func (sb *SegmentBase) Persist(path string) error {
 	return PersistSegmentBase(sb, path)
