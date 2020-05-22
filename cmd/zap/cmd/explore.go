@@ -25,8 +25,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const termNotEncoded = 0
-
 // exploreCmd represents the explore command
 var exploreCmd = &cobra.Command{
 	Use:   "explore [path] [field] <term> <docNum>",
@@ -111,7 +109,7 @@ var exploreCmd = &cobra.Command{
 						running += offset
 					}
 
-					if locAddr != termNotEncoded {
+					if locAddr != math.MaxUint64 {
 						fmt.Printf("Loc details at: %d (%x)\n", locAddr, locAddr)
 						numLChunks, r4 := binary.Uvarint(data[locAddr : locAddr+binary.MaxVarintLen64])
 						n = uint64(r4)

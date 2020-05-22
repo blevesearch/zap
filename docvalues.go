@@ -203,7 +203,7 @@ func (di *docValueReader) visitDocValues(docNum uint64,
 	visitor index.DocumentFieldTermVisitor) error {
 	// binary search the term locations for the docNum
 	start, end := di.getDocValueLocs(docNum)
-	if start == fieldNotUninverted || end == fieldNotUninverted || start == end {
+	if start == math.MaxUint64 || end == math.MaxUint64 || start == end {
 		return nil
 	}
 
@@ -243,7 +243,7 @@ func (di *docValueReader) getDocValueLocs(docNum uint64) (uint64, uint64) {
 	if i < len(di.curChunkHeader) && di.curChunkHeader[i].DocNum == docNum {
 		return ReadDocValueBoundary(i, di.curChunkHeader)
 	}
-	return fieldNotUninverted, fieldNotUninverted
+	return math.MaxUint64, math.MaxUint64
 }
 
 // VisitDocumentFieldTerms is an implementation of the
