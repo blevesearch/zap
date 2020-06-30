@@ -501,7 +501,7 @@ func mergeTermFreqNormLocs(fieldsMap map[string]uint16, term []byte, postItr *Po
 			numBytesLocs := 0
 			for _, loc := range locs {
 				ap := loc.ArrayPositions()
-				numBytesLocs += totalUvarintBytes(uint64(fieldsMap[loc.Field()]-1),
+				numBytesLocs += totalNumbers(uint64(fieldsMap[loc.Field()]-1),
 					loc.Pos(), loc.Start(), loc.End(), uint64(len(ap)), ap)
 			}
 

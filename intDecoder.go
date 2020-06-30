@@ -18,16 +18,17 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	"github.com/blevesearch/bleve/index/scorch/segment"
+	"github.com/bmkessler/streamvbyte"
 )
 
 type chunkedIntDecoder struct {
 	startOffset     uint64
 	dataStartOffset uint64
 	chunkOffsets    []uint64
+	chunkCounts     []uint64
 	curChunkBytes   []byte
 	data            []byte
-	r               *segment.MemUvarintReader
+	svbr            *streamVbReader
 }
 
 func newChunkedIntDecoder(buf []byte, offset uint64) *chunkedIntDecoder {
@@ -43,11 +44,15 @@ func newChunkedIntDecoder(buf []byte, offset uint64) *chunkedIntDecoder {
 	n += uint64(read)
 	if cap(rv.chunkOffsets) >= int(numChunks) {
 		rv.chunkOffsets = rv.chunkOffsets[:int(numChunks)]
+		rv.chunkCounts = rv.chunkCounts[:int(numChunks)]
 	} else {
 		rv.chunkOffsets = make([]uint64, int(numChunks))
+		rv.chunkCounts = make([]uint64, int(numChunks))
 	}
 	for i := 0; i < int(numChunks); i++ {
 		rv.chunkOffsets[i], read = binary.Uvarint(buf[offset+n : offset+n+binary.MaxVarintLen64])
+		n += uint64(read)
+		rv.chunkCounts[i], read = binary.Uvarint(buf[offset+n : offset+n+binary.MaxVarintLen64])
 		n += uint64(read)
 	}
 	rv.dataStartOffset = offset + n
@@ -56,7 +61,7 @@ func newChunkedIntDecoder(buf []byte, offset uint64) *chunkedIntDecoder {
 
 func (d *chunkedIntDecoder) loadChunk(chunk int) error {
 	if d.startOffset == termNotEncoded {
-		d.r = segment.NewMemUvarintReader([]byte(nil))
+		d.svbr = newStreamVbReader([]byte(nil), 0) //segment.NewMemUvarintReader([]byte(nil))
 		return nil
 	}
 
@@ -70,10 +75,10 @@ func (d *chunkedIntDecoder) loadChunk(chunk int) error {
 	start += s
 	end += e
 	d.curChunkBytes = d.data[start:end]
-	if d.r == nil {
-		d.r = segment.NewMemUvarintReader(d.curChunkBytes)
+	if d.svbr == nil {
+		d.svbr = newStreamVbReader(d.curChunkBytes, d.chunkCounts[chunk])
 	} else {
-		d.r.Reset(d.curChunkBytes)
+		d.svbr.reset(d.curChunkBytes, d.chunkCounts[chunk])
 	}
 
 	return nil
@@ -83,10 +88,11 @@ func (d *chunkedIntDecoder) reset() {
 	d.startOffset = 0
 	d.dataStartOffset = 0
 	d.chunkOffsets = d.chunkOffsets[:0]
+	d.chunkCounts = d.chunkCounts[:0]
 	d.curChunkBytes = d.curChunkBytes[:0]
 	d.data = d.data[:0]
-	if d.r != nil {
-		d.r.Reset([]byte(nil))
+	if d.svbr != nil {
+		d.svbr.reset([]byte(nil), 0)
 	}
 }
 
@@ -95,17 +101,81 @@ func (d *chunkedIntDecoder) isNil() bool {
 }
 
 func (d *chunkedIntDecoder) readUvarint() (uint64, error) {
-	return d.r.ReadUvarint()
+	return d.svbr.Read()
 }
 
 func (d *chunkedIntDecoder) SkipUvarint() {
-	d.r.SkipUvarint()
+	//d.svbr.Skip()
 }
 
 func (d *chunkedIntDecoder) SkipBytes(count int) {
-	d.r.SkipBytes(count)
+
+	d.svbr.Skip(count)
 }
 
 func (d *chunkedIntDecoder) Len() int {
-	return d.r.Len()
+	return d.svbr.Len()
+}
+
+type streamVbReader struct {
+	vals []uint32
+	i    int
+}
+
+func (br *streamVbReader) reset(data []byte, count uint64) {
+	br.i = 0
+	if len(data) == 0 {
+		br.vals = br.vals[:0]
+		return
+	}
+
+	if cap(br.vals) <= int(count) {
+		br.vals = make([]uint32, count)
+	} else {
+		br.vals = br.vals[:count]
+	}
+
+	streamvbyte.DecodeUint32(br.vals, data)
+}
+
+func newStreamVbReader(data []byte, count uint64) *streamVbReader {
+	br := &streamVbReader{
+		vals: make([]uint32, count),
+	}
+	if len(data) == 0 || count == 0 {
+		return br
+	}
+
+	streamvbyte.DecodeUint32(br.vals, data)
+	return br
+}
+
+func (br *streamVbReader) Read() (uint64, error) {
+	if len(br.vals) == 0 {
+		return 0, fmt.Errorf("bytesReader Read err: EOF")
+	}
+
+	if br.i > len(br.vals)-1 {
+		return 0, fmt.Errorf("out of bound err - bytesReader")
+	}
+
+	rv := br.vals[br.i]
+	br.i++
+	return uint64(rv), nil
+}
+
+func (br *streamVbReader) Len() int {
+	n := len(br.vals) - br.i
+	if n < 0 {
+		return 0
+	}
+	return n
+}
+
+func (br *streamVbReader) Skip(skip int) error {
+	if br.i+skip-1 >= len(br.vals) {
+		return fmt.Errorf("skip out of bound err - bytesReader")
+	}
+	br.i = br.i + skip
+	return nil
 }

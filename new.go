@@ -677,7 +677,7 @@ func (s *interim) writeDicts() (fdvIndexOffset uint64, dictOffsets []uint64, err
 				if freqNorm.numLocs > 0 {
 					numBytesLocs := 0
 					for _, loc := range locs[locOffset : locOffset+freqNorm.numLocs] {
-						numBytesLocs += totalUvarintBytes(
+						numBytesLocs += totalNumbers(
 							uint64(loc.fieldID), loc.pos, loc.start, loc.end,
 							uint64(len(loc.arrayposs)), loc.arrayposs)
 					}
@@ -857,4 +857,9 @@ func numUvarintBytes(x uint64) (n int) {
 		n++
 	}
 	return n + 1
+}
+
+func totalNumbers(a, b, c, d, e uint64, more []uint64) (n int) {
+	n = 5 + len(more)
+	return
 }
