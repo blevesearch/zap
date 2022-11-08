@@ -1,5 +1,7 @@
 # zap file format
 
+# NOTE: active development of the zap library has moved to [https://github.com/blevesearch/zapx](https://github.com/blevesearch/zapx)
+
 Advanced ZAP File Format Documentation is [here](zap.md).
 
 The file is written in the reverse order that we typically access data.  This helps us write in one pass since later sections of the file require file offsets of things we've already written.
